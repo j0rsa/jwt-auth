@@ -1,22 +1,25 @@
-use actix_web::{HttpResponse, web, HttpRequest};
-
-mod internal;
-pub mod models;
+use actix_web::{HttpRequest, HttpResponse, web};
 
 use models::*;
 
-//async fn generate_token(request: web::Json<TokenRequest>) -> HttpResponse {
-//
-//    let my_claims = Claims {
-//        sub,
-//        exp: now_plus_days(30)
-//    };
-//    let token = encode(&Header::default(), &my_claims, "secret".as_ref())
-//        .expect("Unable to encode claims");
-//    HttpResponse::Ok().json(Token {
-//        token
-//    })
-//}
+mod internal;
+mod db;
+pub mod models;
+
+pub async fn generate_token(request: web::Json<TokenRequest>) -> HttpResponse {
+    let user_result = db::get_user(&request.user);
+    match user_result {
+        Ok(user) if user.password == request.password => {
+            let my_claims = Claims {
+                sub: user.name,
+                exp: now_plus_days(30),
+            };
+            HttpResponse::Ok().json(Token { token })
+        },
+        Ok(user) => HttpResponse::BadRequest().body("Wrong password!"),
+        Err(e) => HttpResponse::BadRequest().body(e.to_string())
+    }
+}
 
 pub async fn refresh(request: web::Json<RefreshTokenRequest>) -> HttpResponse {
     let token = internal::refresh_token(&request.token);
