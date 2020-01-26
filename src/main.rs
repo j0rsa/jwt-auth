@@ -4,6 +4,7 @@ extern crate env_logger;
 use actix_web::{App, HttpServer, web};
 use r2d2_postgres::PostgresConnectionManager;
 use r2d2_postgres::postgres::{NoTls};
+use std::env;
 mod health;
 mod token;
 
@@ -11,11 +12,11 @@ mod token;
 async fn main() -> std::io::Result<()> {
     env_logger::init();
     let client_url = &format!("host={} port={} user={} password={} dbname={}",
-                              option_env!("DB_HOST").unwrap_or("localhost"),
-                              option_env!("DB_PORT").unwrap_or("5432"),
-                              option_env!("DB_USER").unwrap_or("postgres"),
-                              option_env!("DB_PASSWORD").unwrap_or("postgres"),
-                              option_env!("DB_NAME").unwrap_or("postgres"));
+                              env::var("DB_HOST").unwrap_or("localhost".to_string()),
+                              env::var("DB_PORT").unwrap_or("5432".to_string()),
+                              env::var("DB_USER").unwrap_or("postgres".to_string()),
+                              env::var("DB_PASSWORD").unwrap_or("postgres".to_string()),
+                              env::var("DB_NAME").unwrap_or("postgres".to_string()));
 
     info!("Connecting to DB: {}", &client_url);
     let manager = PostgresConnectionManager::new(

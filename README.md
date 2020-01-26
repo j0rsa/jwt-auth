@@ -2,6 +2,10 @@
 
 This is a simple service to authenticate users and check their authentication information according to JWT validity (signature, expiration, sub) 
 
+Base Docker image: `scratch`
+
+Docker image size < 10 MB
+
 ## Endpoints
 | Method | URL | Description |
 | ------:| --- | ----------- |

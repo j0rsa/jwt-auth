@@ -1,4 +1,4 @@
-use std::io;
+use std::{io, env};
 use std::io::ErrorKind;
 
 use r2d2;
@@ -33,9 +33,9 @@ pub fn get_user(pool: &Pool, name: &String) -> Result<User, io::Error> {
 
 fn find_user() -> String {
     format!("SELECT {0}, {1} FROM {2} WHERE {0}=$1",
-            option_env!("DB_QUERY_USER_NAME").unwrap_or("name"),
-            option_env!("DB_QUERY_USER_PASSWORD").unwrap_or("password"),
-            option_env!("DB_QUERY_USERS_TABLE").unwrap_or("users"),
+            env::var("DB_QUERY_USER_NAME").unwrap_or("name".to_string()),
+            env::var("DB_QUERY_USER_PASSWORD").unwrap_or("password".to_string()),
+            env::var("DB_QUERY_USERS_TABLE").unwrap_or("users".to_string()),
     )
 }
 
