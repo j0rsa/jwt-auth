@@ -29,13 +29,14 @@ fn get_env_token_secret() -> String {
     env::var("TOKEN_SECRET").expect("No token secret found!")
 }
 
-pub fn generate_token(user_name: String) -> String {
-    generate_token_with_secret(user_name, &get_env_token_secret())
+pub fn generate_token(user_id: String, user_name: String) -> String {
+    generate_token_with_secret(user_id, user_name, &get_env_token_secret())
 }
 
-fn generate_token_with_secret(sub: String, secret: &String) -> String {
+fn generate_token_with_secret(sub: String, name: String, secret: &String) -> String {
     let my_claims = Claims {
         sub,
+        name,
         iat: now(),
         exp: now_plus_days(30)
     };
@@ -49,7 +50,7 @@ pub fn refresh_token(token: &str) -> String {
 
 fn refresh_token_with_secret(token: &str, secret: &String) -> String {
     let claims = get_claims_with_secret(token, secret);
-    generate_token_with_secret(claims.sub, secret)
+    generate_token_with_secret(claims.sub, claims.name, secret)
 }
 
 pub fn get_claims(token: &str) -> Claims {
@@ -98,24 +99,28 @@ mod tests {
     #[test]
     fn test_generate_token_with_secret() {
         let secret = "test".to_string();
-        let sub = "123test".to_string();
-        let token = generate_token_with_secret(sub.clone(), &secret);
+        let id = "id1".to_string();
+        let name = "123test".to_string();
+        let token = generate_token_with_secret(id.clone(), name.clone(), &secret);
         assert_ne!(token, "");
         let claims = get_claims_with_secret(&token, &secret);
-        assert_eq!(claims.sub, sub);
+        assert_eq!(claims.sub, id);
+        assert_eq!(claims.name, name);
     }
 
     #[test]
     fn test_refresh_token_with_secret() {
         let secret = "test".to_string();
-        let sub = "123test".to_string();
-        let token = generate_token_with_secret(sub.clone(), &secret);
+        let id = "id1".to_string();
+        let name = "123test".to_string();
+        let token = generate_token_with_secret(id.clone(), name.clone(), &secret);
         assert_ne!(token, "");
         let claims = get_claims_with_secret(&token, &secret);
         sleep(Duration::from_millis(1));
         let refreshed_token = refresh_token_with_secret(&token, &secret);
         let refreshed_claims = get_claims_with_secret(&refreshed_token, &secret);
-        assert_eq!(refreshed_claims.sub, sub);
+        assert_eq!(refreshed_claims.sub, id);
+        assert_eq!(refreshed_claims.name, name);
         assert!(refreshed_claims.iat > claims.iat)
     }
 }

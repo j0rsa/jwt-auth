@@ -3,6 +3,7 @@ use serde::{Serialize, Deserialize};
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
     pub sub: String,
+    pub name: String,
     // issued at
     pub iat: u128,
     // expired after

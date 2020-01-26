@@ -17,7 +17,7 @@ This is a simple service to authenticate users and check their authentication in
 | `GET` | `/health` | Healthcheck  which returns Code 200|
 | `POST` | `/auth/token` | Get JWT token by passing user credentials `{ "user": "name", "password": "secret"}` |
 | `POST` | `/auth/refresh` | Refresh token with a new one by passing the old valid one `{ "token": "eyJhbGciOiJIUz..." }` |
-| `POST` | `/auth/check` | Checks the token and returns code 200 with Header: `X-Auth-User` with user name |
+| `POST` | `/auth/check` | Checks the token and returns code 200 with Headers: `X-Auth-Id` with user id and `X-Auth-User` with user name |
 
 ## Environment variables
 | Variable | Default value | Description |
@@ -28,10 +28,13 @@ This is a simple service to authenticate users and check their authentication in
 | DB_USER | postgres | Postgres user |
 | DB_PASSWORD | postgres | Postgres password |
 | DB_NAME | postgres | Database name |
+| DB_QUERY_USER_ID | id | `Id` column name in users table |
 | DB_QUERY_USER_NAME | name | `Username` column name in users table |
 | DB_QUERY_USER_PASSWORD | password | `Password` column name in users table |
 | DB_QUERY_USERS_TABLE | users | users table |
 | TOKEN_SECRET | -- | JWT HS256 Secret Key |
+| BIND_ADDRESS | 0.0.0.0 | Address of web server to listen connections |
+| PASSWORD_CHECK_TYPE | RAW | Type to compare passwords with the one from DB (values: RAW, SHA256, SHA512) |
 
 # Build
 

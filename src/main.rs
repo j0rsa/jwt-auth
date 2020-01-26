@@ -17,6 +17,7 @@ async fn main() -> std::io::Result<()> {
                               env::var("DB_USER").unwrap_or("postgres".to_string()),
                               env::var("DB_PASSWORD").unwrap_or("postgres".to_string()),
                               env::var("DB_NAME").unwrap_or("postgres".to_string()));
+    let address = env::var("BIND_ADDRESS").unwrap_or("0.0.0.0".to_string());
 
     info!("Connecting to DB: {}", &client_url);
     let manager = PostgresConnectionManager::new(
@@ -33,7 +34,7 @@ async fn main() -> std::io::Result<()> {
             .service(web::resource("/auth/refresh").route(web::post().to(token::refresh)))
             .service(web::resource("/auth/check").route(web::post().to(token::check)))
     )
-        .bind("0.0.0.0:8080")?
+        .bind(format!("{}:8080", &address))?
         .run()
         .await
 }

@@ -22,8 +22,9 @@ pub fn get_user(pool: &Pool, name: &String) -> Result<User, io::Error> {
             if rows.len() > 1 { return Err(io::Error::new(ErrorKind::InvalidInput, "User is not unique")) };
             let row = rows.get(0).unwrap();
             let user = User {
-                name: row.get(0),
-                password: row.get(1),
+                id: row.get(0),
+                name: row.get(1),
+                password: row.get(2),
             };
             Ok(user)
         }
@@ -32,7 +33,8 @@ pub fn get_user(pool: &Pool, name: &String) -> Result<User, io::Error> {
 }
 
 fn find_user() -> String {
-    format!("SELECT {0}, {1} FROM {2} WHERE {0}=$1",
+    format!("SELECT {0}, {1}, {2} FROM {3} WHERE {1}=$1",
+            env::var("DB_QUERY_USER_ID").unwrap_or("id".to_string()),
             env::var("DB_QUERY_USER_NAME").unwrap_or("name".to_string()),
             env::var("DB_QUERY_USER_PASSWORD").unwrap_or("password".to_string()),
             env::var("DB_QUERY_USERS_TABLE").unwrap_or("users".to_string()),
