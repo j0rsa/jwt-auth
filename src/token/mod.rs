@@ -1,13 +1,14 @@
 use actix_web::{HttpRequest, HttpResponse, web};
 
 use models::*;
+use crate::token::db::Pool;
 
 mod internal;
 mod db;
 pub mod models;
 
-pub async fn generate_token(request: web::Json<TokenRequest>) -> HttpResponse {
-    let user_result = db::get_user(&request.user);
+pub async fn generate_token(pool: actix_web::web::Data<Pool>, request: web::Json<TokenRequest>) -> HttpResponse {
+    let user_result = db::get_user(&pool,&request.user);
     match user_result {
         Ok(user) if user.password == request.password => {
             let token = internal::generate_token(user.name);

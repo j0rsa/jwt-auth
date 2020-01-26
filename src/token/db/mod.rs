@@ -1,26 +1,20 @@
-extern crate postgres;
-
 use std::io;
 use std::io::ErrorKind;
-
-use postgres::{Client, NoTls};
-
+use r2d2_postgres::postgres::{NoTls};
 use models::User;
+use r2d2;
+use r2d2_postgres;
 
 pub mod models;
 
-pub fn get_user(name: &String) -> Result<User, io::Error> {
-    let client_url = &format!("host={} port={} user={} password={} dbname={}",
-                                            option_env!("DB_HOST").unwrap_or("localhost"),
-                                            option_env!("DB_PORT").unwrap_or("5432"),
-                                            option_env!("DB_USER").unwrap_or("postgres"),
-                                            option_env!("DB_PASSWORD").unwrap_or("postgres"),
-                                            option_env!("DB_NAME").unwrap_or("postgres"));
-    let mut connection = Client::connect(client_url, NoTls).unwrap();
+pub type Pool = r2d2::Pool<r2d2_postgres::PostgresConnectionManager<NoTls>>;
+pub type Connection = r2d2::PooledConnection<r2d2_postgres::PostgresConnectionManager<NoTls>>;
+
+pub fn get_user(pool: &Pool,name: &String) -> Result<User, io::Error> {
 //    const USER_NAME: &'static str = &env_or("DB_QUERY_USER_NAME", "name");
 //const USER_PASS: &'static str = &env_or("DB_QUERY_USER_PASSWORD", "password");
 //const USERS_TABLE: &'static str = &env_or("DB_QUERY_USERS_TABLE", "users");
-
+    let mut connection: Connection = pool.get().unwrap();
     let result = connection.query(
         "SELECT {0}, {1} FROM {2} WHERE {0}=$1",
         &[name]);
