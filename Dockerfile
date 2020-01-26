@@ -1,6 +1,8 @@
 #--- Build
 FROM rust:latest as cargo-build
 
+LABEL authors="red.avtovo@gmail.com, keyridan@gmail.com"
+
 RUN apt-get update && \
     apt-get install musl-tools -y && \
     rustup target add x86_64-unknown-linux-musl
