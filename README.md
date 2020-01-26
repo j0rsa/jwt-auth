@@ -2,10 +2,14 @@
 
 This is a simple service to authenticate users and check their authentication information according to JWT validity (signature, expiration, sub) 
 
-Base Docker image: `scratch`
+![Docker Cloud Automated build](https://img.shields.io/docker/cloud/automated/j0rsa/jwt-auth)
+![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/j0rsa/jwt-auth)
 
-[![](https://images.microbadger.com/badges/image/j0rsa/jwt-auth.svg)](https://microbadger.com/images/j0rsa/jwt-auth "Get your own image badge on microbadger.com")
-[![](https://images.microbadger.com/badges/version/j0rsa/jwt-auth.svg)](https://microbadger.com/images/j0rsa/jwt-auth "Get your own version badge on microbadger.com")
+![Base Docker image scratch](https://img.shields.io/badge/Base%20Image-Scratch-blue)
+![Image Size](https://img.shields.io/badge/image%20size-9.8MB-green)
+![MicroBadger Layers](https://img.shields.io/microbadger/layers/j0rsa/jwt-auth)
+
+[![CodeFactor](https://www.codefactor.io/repository/github/j0rsa/jwt-auth/badge/master)](https://www.codefactor.io/repository/github/j0rsa/jwt-auth/overview/master)
 
 ## Endpoints
 | Method | URL | Description |
