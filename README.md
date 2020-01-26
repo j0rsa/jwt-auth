@@ -27,6 +27,7 @@ Base Docker image: `scratch`
 | DB_QUERY_USER_NAME | name | `Username` column name in users table |
 | DB_QUERY_USER_PASSWORD | password | `Password` column name in users table |
 | DB_QUERY_USERS_TABLE | users | users table |
+| TOKEN_SECRET | -- | JWT HS256 Secret Key |
 
 # Build
 
