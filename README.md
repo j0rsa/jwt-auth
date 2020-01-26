@@ -4,7 +4,8 @@ This is a simple service to authenticate users and check their authentication in
 
 Base Docker image: `scratch`
 
-Docker image size < 10 MB
+[![](https://images.microbadger.com/badges/image/j0rsa/jwt-auth.svg)](https://microbadger.com/images/j0rsa/jwt-auth "Get your own image badge on microbadger.com")
+[![](https://images.microbadger.com/badges/version/j0rsa/jwt-auth.svg)](https://microbadger.com/images/j0rsa/jwt-auth "Get your own version badge on microbadger.com")
 
 ## Endpoints
 | Method | URL | Description |
