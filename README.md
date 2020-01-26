@@ -23,7 +23,7 @@ This is a simple service to authenticate users and check their authentication in
 | DB_QUERY_USER_PASSWORD | password | `Password` column name in users table |
 | DB_QUERY_USERS_TABLE | users | users table |
 
-#Build
+# Build
 
 ## Build release locally
     cargo build --release
