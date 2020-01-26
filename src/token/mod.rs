@@ -10,13 +10,10 @@ pub async fn generate_token(request: web::Json<TokenRequest>) -> HttpResponse {
     let user_result = db::get_user(&request.user);
     match user_result {
         Ok(user) if user.password == request.password => {
-            let my_claims = Claims {
-                sub: user.name,
-                exp: now_plus_days(30),
-            };
-            HttpResponse::Ok().json(Token { token })
+            let token = internal::generate_token(user.name);
+            HttpResponse::Ok().json(NewTokenResponse { token })
         },
-        Ok(user) => HttpResponse::BadRequest().body("Wrong password!"),
+        Ok(_) => HttpResponse::BadRequest().body("Wrong password!"),
         Err(e) => HttpResponse::BadRequest().body(e.to_string())
     }
 }
