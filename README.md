@@ -6,7 +6,7 @@ This is a simple service to authenticate users and check their authentication in
 [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/j0rsa/jwt-auth)](https://hub.docker.com/repository/docker/j0rsa/jwt-auth)
 
 [![Base Docker image scratch](https://img.shields.io/badge/Base%20Image-Scratch-blue)](https://hub.docker.com/repository/docker/j0rsa/jwt-auth)
-[![Image Size](https://img.shields.io/badge/image%20size-9.71MB-green)](https://hub.docker.com/repository/docker/j0rsa/jwt-auth)
+[![Image Size](https://img.shields.io/badge/image%20size-9.85MB-green)](https://hub.docker.com/repository/docker/j0rsa/jwt-auth)
 [![MicroBadger Layers](https://img.shields.io/microbadger/layers/j0rsa/jwt-auth)](https://hub.docker.com/repository/docker/j0rsa/jwt-auth)
 
 [![CodeFactor](https://www.codefactor.io/repository/github/j0rsa/jwt-auth/badge/master)](https://www.codefactor.io/repository/github/j0rsa/jwt-auth/overview/master)
@@ -48,7 +48,7 @@ This is a simple service to authenticate users and check their authentication in
     cargo build --release
 
 ## Build release in docker and prepare an image
-    docker build -t jwt-auth .
+    docker build -t j0rsa/jwt-auth .
     
 ref: https://shaneutt.com/blog/rust-fast-small-docker-image-builds/
 
