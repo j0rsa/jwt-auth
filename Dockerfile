@@ -20,7 +20,6 @@ FROM scratch
 
 LABEL authors="red.avtovo@gmail.com, keyridan@gmail.com"
 
-WORKDIR /app
 COPY --from=cargo-build /usr/src/app/target/x86_64-unknown-linux-musl/release/jwt-auth .
 
 ENV RUST_LOG=info
