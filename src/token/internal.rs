@@ -11,6 +11,7 @@ use token::models::Claims;
 use crate::token;
 use uuid::Uuid;
 use self::jwt::Algorithm;
+use serde_json::Value;
 
 fn now() -> u128 {
     SystemTime::now()
@@ -102,9 +103,9 @@ fn jwt_validation() -> Validation {
         validate_exp: true,
         validate_nbf: true,
 
-        iss: env_iss(),
+        iss: Some(env_iss()),
         sub: None,
-        aud: env_aud(),
+        aud: Some(Value::String(env_aud())),
 
         algorithms: vec![Algorithm::HS256],
     }
