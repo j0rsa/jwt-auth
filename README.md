@@ -36,6 +36,10 @@ This is a simple service to authenticate users and check their authentication in
 | BIND_ADDRESS | 0.0.0.0 | Address of web server to listen connections |
 | BIND_PORT | 8080 | Port of web server to listen connections |
 | PASSWORD_CHECK_TYPE | RAW | Type to compare passwords with the one from DB (values: RAW, SHA256, SHA512, BCRYPT) |
+| JWT_ISS | "" | iss (issuer): Issuer of the JWT |
+| JWT_AUD | "" | aud (audience): Recipient for which the JWT is intended |
+| JWT_EXP_DAYS | 30 | exp (expiration time): Time in days after which the JWT expires |
+| JWT_NBF_DAYS | 0 | nbf (not before time): Time in days before which the JWT must not be accepted for processing |
 
 # Build
 

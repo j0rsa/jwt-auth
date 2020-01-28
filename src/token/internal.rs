@@ -2,13 +2,14 @@ extern crate jsonwebtoken as jwt;
 
 use std::env;
 use std::ops::Add;
+use std::str::FromStr;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use jwt::{decode, encode, Header, Validation};
 
 use token::models::Claims;
-
 use crate::token;
+use uuid::Uuid;
 
 fn now() -> u128 {
     SystemTime::now()
@@ -35,13 +36,35 @@ pub fn generate_token(user_id: String, user_name: String) -> String {
 
 fn generate_token_with_secret(sub: String, name: String, secret: &String) -> String {
     let my_claims = Claims {
+        iss: env::var("JWT_ISS").unwrap_or("".to_string()),
         sub,
-        name,
         iat: now(),
-        exp: now_plus_days(30)
+        exp: now_plus_days(get_exp_days()),
+        aud: env::var("JWT_AUD").unwrap_or("".to_string()),
+        nbf: now_plus_days(get_nbf_days()),
+        jti: Uuid::new_v4().to_string(),
+        name,
     };
     encode(&Header::default(), &my_claims, secret.as_ref())
         .expect("Unable to encode claims")
+}
+
+fn get_exp_days() -> u64 {
+    return match u64::from_str(
+        env::var("JWT_EXP_DAYS").unwrap_or("30".to_string()).as_ref()
+    ) {
+        Ok(v) => v,
+        Err(e) => panic!(e)
+    };
+}
+
+fn get_nbf_days() -> u64 {
+    return match u64::from_str(
+        env::var("JWT_NBF_DAYS").unwrap_or("0".to_string()).as_ref()
+    ) {
+        Ok(v) => v,
+        Err(e) => panic!(e)
+    };
 }
 
 pub fn refresh_token(token: &str) -> String {
@@ -90,7 +113,7 @@ mod tests {
 
     #[test]
     fn test_get_claims() {
-        let token= "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjk1MTYyMzkwMjJ9.xGqmlkmaEEP4qNwUmrXeKJm-zboYPqiN_uZEpKPPE5o";
+        let token= "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJzdWIiOiIxMjM0NTY3ODkwIiwiYXVkIjoiIiwiZXhwIjoxNTgyODQyODUzMzEyLCJuYmYiOjE1ODAyNTA4NTMzMTIsImlhdCI6MTU4MDI1MDg1MzMxMiwianRpIjoiZDEwM2FiM2QtZmM1My00OTM2LThkZjQtM2FkNTdkNmI1YjNmIiwibmFtZSI6IjEyM3Rlc3QifQ.xa57RMHUD3sTnu561IsSedgd-j627GrrKMInQt_zATk";
         let secret = "test".to_string();
         let claims = get_claims_with_secret(&token.to_string(), &secret);
         assert_eq!(claims.sub, "1234567890");
