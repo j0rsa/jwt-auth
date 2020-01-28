@@ -40,6 +40,7 @@ This is a simple service to authenticate users and check their authentication in
 | JWT_AUD | "" | aud (audience): Recipient for which the JWT is intended |
 | JWT_EXP_DAYS | 30 | exp (expiration time): Time in days after which the JWT expires |
 | JWT_NBF_DAYS | 0 | nbf (not before time): Time in days before which the JWT must not be accepted for processing |
+| JWT_LEEWAY_SEC | 0 | leeway (in seconds) to the `exp`, `iat` and `nbf` validation to  account for clock skew |
 
 # Build
 

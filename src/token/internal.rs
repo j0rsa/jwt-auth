@@ -10,6 +10,7 @@ use jwt::{decode, encode, Header, Validation};
 use token::models::Claims;
 use crate::token;
 use uuid::Uuid;
+use self::jwt::Algorithm;
 
 fn now() -> u128 {
     SystemTime::now()
@@ -36,12 +37,12 @@ pub fn generate_token(user_id: String, user_name: String) -> String {
 
 fn generate_token_with_secret(sub: String, name: String, secret: &String) -> String {
     let my_claims = Claims {
-        iss: env::var("JWT_ISS").unwrap_or("".to_string()),
+        iss: env_iss(),
         sub,
         iat: now(),
-        exp: now_plus_days(get_exp_days()),
-        aud: env::var("JWT_AUD").unwrap_or("".to_string()),
-        nbf: now_plus_days(get_nbf_days()),
+        exp: now_plus_days(env_exp_days()),
+        aud: env_aud(),
+        nbf: now_plus_days(env_nbf_days()),
         jti: Uuid::new_v4().to_string(),
         name,
     };
@@ -49,7 +50,15 @@ fn generate_token_with_secret(sub: String, name: String, secret: &String) -> Str
         .expect("Unable to encode claims")
 }
 
-fn get_exp_days() -> u64 {
+fn env_aud() -> String {
+    env::var("JWT_AUD").unwrap_or("".to_string())
+}
+
+fn env_iss() -> String {
+    env::var("JWT_ISS").unwrap_or("".to_string())
+}
+
+fn env_exp_days() -> u64 {
     return match u64::from_str(
         env::var("JWT_EXP_DAYS").unwrap_or("30".to_string()).as_ref()
     ) {
@@ -58,7 +67,7 @@ fn get_exp_days() -> u64 {
     };
 }
 
-fn get_nbf_days() -> u64 {
+fn env_nbf_days() -> u64 {
     return match u64::from_str(
         env::var("JWT_NBF_DAYS").unwrap_or("0".to_string()).as_ref()
     ) {
@@ -81,9 +90,33 @@ pub fn get_claims(token: &str) -> Claims {
 }
 
 fn get_claims_with_secret(token: &str, secret: &String) -> Claims {
-    let claims = decode::<Claims>(&token, secret.as_ref(), &Validation::default())
+    let claims = decode::<Claims>(&token, secret.as_ref(), &jwt_validation())
         .expect("Unable to decode token").claims;
     claims
+}
+
+fn jwt_validation() -> Validation {
+    Validation {
+        leeway: env_leeway(),
+
+        validate_exp: true,
+        validate_nbf: true,
+
+        iss: env_iss(),
+        sub: None,
+        aud: env_aud(),
+
+        algorithms: vec![Algorithm::HS256],
+    }
+}
+
+fn env_leeway() -> i64 {
+    return match i64::from_str(
+        env::var("JWT_LEEWAY_SEC").unwrap_or("0".to_string()).as_ref()
+    ) {
+        Ok(v) => v,
+        Err(e) => panic!(e)
+    };
 }
 
 const BEARER_LENGTH: usize = "Bearer ".len();
