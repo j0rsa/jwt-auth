@@ -1,17 +1,14 @@
 extern crate jsonwebtoken as jwt;
 
-use std::env;
 use std::ops::Add;
-use std::str::FromStr;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
-
 use jwt::{decode, encode, Header, Validation};
-
+use uuid::Uuid;
 use token::models::Claims;
 use crate::token;
-use uuid::Uuid;
 use self::jwt::Algorithm;
 use serde_json::Value;
+mod conf;
 
 fn now() -> u128 {
     SystemTime::now()
@@ -28,22 +25,18 @@ fn now_plus_days(days: u64) -> u128 {
         .as_millis()
 }
 
-fn get_env_token_secret() -> String {
-    env::var("TOKEN_SECRET").expect("No token secret found!")
-}
-
 pub fn generate_token(user_id: String, user_name: String) -> String {
-    generate_token_with_secret(user_id, user_name, &get_env_token_secret())
+    generate_token_with_secret(user_id, user_name, &conf::env_token_secret())
 }
 
 fn generate_token_with_secret(sub: String, name: String, secret: &String) -> String {
     let my_claims = Claims {
-        iss: env_iss(),
+        iss: conf::env_iss(),
         sub,
         iat: now(),
-        exp: now_plus_days(env_exp_days()),
-        aud: env_aud(),
-        nbf: now_plus_days(env_nbf_days()),
+        exp: now_plus_days(conf::env_exp_days()),
+        aud: conf::env_aud(),
+        nbf: now_plus_days(conf::env_nbf_days()),
         jti: Uuid::new_v4().to_string(),
         name,
     };
@@ -51,34 +44,8 @@ fn generate_token_with_secret(sub: String, name: String, secret: &String) -> Str
         .expect("Unable to encode claims")
 }
 
-fn env_aud() -> String {
-    env::var("JWT_AUD").unwrap_or("".to_string())
-}
-
-fn env_iss() -> String {
-    env::var("JWT_ISS").unwrap_or("".to_string())
-}
-
-fn env_exp_days() -> u64 {
-    return match u64::from_str(
-        env::var("JWT_EXP_DAYS").unwrap_or("30".to_string()).as_ref()
-    ) {
-        Ok(v) => v,
-        Err(e) => panic!(e)
-    };
-}
-
-fn env_nbf_days() -> u64 {
-    return match u64::from_str(
-        env::var("JWT_NBF_DAYS").unwrap_or("0".to_string()).as_ref()
-    ) {
-        Ok(v) => v,
-        Err(e) => panic!(e)
-    };
-}
-
 pub fn refresh_token(token: &str) -> String {
-    refresh_token_with_secret(token, &get_env_token_secret())
+    refresh_token_with_secret(token, &conf::env_token_secret())
 }
 
 fn refresh_token_with_secret(token: &str, secret: &String) -> String {
@@ -87,7 +54,7 @@ fn refresh_token_with_secret(token: &str, secret: &String) -> String {
 }
 
 pub fn get_claims(token: &str) -> Claims {
-    get_claims_with_secret(token, &get_env_token_secret())
+    get_claims_with_secret(token, &conf::env_token_secret())
 }
 
 fn get_claims_with_secret(token: &str, secret: &String) -> Claims {
@@ -98,26 +65,17 @@ fn get_claims_with_secret(token: &str, secret: &String) -> Claims {
 
 fn jwt_validation() -> Validation {
     Validation {
-        leeway: env_leeway(),
+        leeway: conf::env_leeway(),
 
         validate_exp: true,
         validate_nbf: true,
 
-        iss: Some(env_iss()),
+        iss: Some(conf::env_iss()),
         sub: None,
-        aud: Some(Value::String(env_aud())),
+        aud: Some(Value::String(conf::env_aud())),
 
         algorithms: vec![Algorithm::HS256],
     }
-}
-
-fn env_leeway() -> i64 {
-    return match i64::from_str(
-        env::var("JWT_LEEWAY_SEC").unwrap_or("0".to_string()).as_ref()
-    ) {
-        Ok(v) => v,
-        Err(e) => panic!(e)
-    };
 }
 
 const BEARER_LENGTH: usize = "Bearer ".len();

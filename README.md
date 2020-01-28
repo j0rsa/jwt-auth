@@ -32,10 +32,10 @@ This is a simple service to authenticate users and check their authentication in
 | DB_QUERY_USER_NAME | name | `Username` column name in users table |
 | DB_QUERY_USER_PASSWORD | password | `Password` column name in users table |
 | DB_QUERY_USERS_TABLE | users | users table |
-| TOKEN_SECRET | -- | JWT HS256 Secret Key |
 | BIND_ADDRESS | 0.0.0.0 | Address of web server to listen connections |
 | BIND_PORT | 8080 | Port of web server to listen connections |
 | PASSWORD_CHECK_TYPE | RAW | Type to compare passwords with the one from DB (values: RAW, SHA256, SHA512, BCRYPT) |
+| JWT_SECRET | -- | JWT HS256 Secret Key |
 | JWT_ISS | "" | iss (issuer): Issuer of the JWT |
 | JWT_AUD | "" | aud (audience): Recipient for which the JWT is intended |
 | JWT_EXP_DAYS | 30 | exp (expiration time): Time in days after which the JWT expires |
