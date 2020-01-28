@@ -35,7 +35,7 @@ This is a simple service to authenticate users and check their authentication in
 | TOKEN_SECRET | -- | JWT HS256 Secret Key |
 | BIND_ADDRESS | 0.0.0.0 | Address of web server to listen connections |
 | BIND_PORT | 8080 | Port of web server to listen connections |
-| PASSWORD_CHECK_TYPE | RAW | Type to compare passwords with the one from DB (values: RAW, SHA256, SHA512) |
+| PASSWORD_CHECK_TYPE | RAW | Type to compare passwords with the one from DB (values: RAW, SHA256, SHA512, BCRYPT) |
 
 # Build
 

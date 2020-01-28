@@ -6,7 +6,7 @@ use std::env;
 
 mod internal;
 mod db;
-mod sha;
+mod hash;
 pub mod models;
 
 pub async fn generate_token(pool: actix_web::web::Data<Pool>, request: web::Json<TokenRequest>) -> HttpResponse {
@@ -25,8 +25,9 @@ fn password_is_valid(db_password: &str, request_password: &str) -> bool {
     let check_type = env::var("PASSWORD_CHECK_TYPE").unwrap_or("RAW".to_string());
     match check_type.to_uppercase().as_ref() {
         "RAW" => db_password == request_password,
-        "SHA256" => db_password == sha::sha256hash(request_password),
-        "SHA512" => db_password == sha::sha512hash(request_password),
+        "SHA256" => db_password == hash::sha256hash(request_password),
+        "SHA512" => db_password == hash::sha512hash(request_password),
+        "BCRYPT" => hash::verify_bcrypt_hash(request_password, db_password),
         _ => panic!("Unsupported password check type {}", check_type)
     }
 }

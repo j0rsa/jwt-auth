@@ -15,9 +15,14 @@ pub fn sha512hash(input: &str) -> String {
     format!("{:x}",result)
 }
 
+pub fn verify_bcrypt_hash(password: &str, password_hash: &str) -> bool {
+    let result = bcrypt::verify(password, password_hash);
+    return result.is_ok() && result.ok().unwrap_or(false)
+}
+
 #[cfg(test)]
 mod tests {
-    use crate::token::sha::{sha256hash, sha512hash};
+    use crate::token::hash::{sha256hash, sha512hash, verify_bcrypt_hash};
 
     #[test]
     fn test_sha256() {
@@ -28,6 +33,20 @@ mod tests {
     fn test_sha512() {
         let hash = sha512hash("test");
         assert_eq!("ee26b0dd4af7e749aa1a8ee3c10ae9923f618980772e473f8819a5d4940e0db27ac185f8a0e1d5f84f88bc887fd67b143732c304cc5fa9ad8e6f57f50028a8ff", hash);
+    }
+
+    #[test]
+    fn test_bcrypt_valid() {
+        let password = "test123";
+        let hash = "$2y$12$Pa/biT5ibBUJuDwXg6hr4.GLedsulQlHMJEA7O/.aXNkm.FF8OysG";
+        assert!(verify_bcrypt_hash(password, hash))
+    }
+
+    #[test]
+    fn test_bcrypt_invalid() {
+        let password = "test123";
+        let hash = "$2y$12$ulN.fejQw49xAXgFR1YwheYZsCPLxAQIqxCJYgScKeno36bEnqjUq";
+        assert_eq!(verify_bcrypt_hash(password, hash), false)
     }
 
 }
