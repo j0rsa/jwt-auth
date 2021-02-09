@@ -1,23 +1,26 @@
-use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::{web, HttpRequest, HttpResponse};
 
-use models::*;
 use crate::token::db::Pool;
+use models::*;
 use std::env;
 
-mod internal;
 mod db;
 mod hash;
+mod internal;
 pub mod models;
 
-pub async fn generate_token(pool: actix_web::web::Data<Pool>, request: web::Json<TokenRequest>) -> HttpResponse {
-    let user_result = db::get_user(&pool,&request.user);
+pub async fn generate_token(
+    pool: actix_web::web::Data<Pool>,
+    request: web::Json<TokenRequest>,
+) -> HttpResponse {
+    let user_result = db::get_user(&pool, &request.user);
     match user_result {
         Ok(user) if password_is_valid(&user.password, &request.password) => {
-            let token = internal::generate_token(user.id,user.name);
+            let token = internal::generate_token(user.id, user.name);
             HttpResponse::Ok().json(NewTokenResponse { token })
-        },
+        }
         Ok(_) => HttpResponse::BadRequest().body("Wrong password!"),
-        Err(e) => HttpResponse::BadRequest().body(e.to_string())
+        Err(e) => HttpResponse::BadRequest().body(e.to_string()),
     }
 }
 
@@ -28,7 +31,7 @@ fn password_is_valid(db_password: &str, request_password: &str) -> bool {
         "SHA256" => db_password == hash::sha256hash(request_password),
         "SHA512" => db_password == hash::sha512hash(request_password),
         "BCRYPT" => hash::verify_bcrypt_hash(request_password, db_password),
-        _ => panic!("Unsupported password check type {}", check_type)
+        _ => panic!("Unsupported password check type {}", check_type),
     }
 }
 
@@ -42,12 +45,13 @@ pub async fn check(req: HttpRequest) -> HttpResponse {
     let header = req.headers().get("Authorization");
     match header {
         Some(header) => {
-            let authorization_header_value = header.to_str()
+            let authorization_header_value = header
+                .to_str()
                 .expect("Authorization has no string value")
                 .to_string();
             check_auth_value(authorization_header_value)
         }
-        _ => HttpResponse::Unauthorized().body("No Authorization Header")
+        _ => HttpResponse::Unauthorized().body("No Authorization Header"),
     }
 }
 
@@ -61,6 +65,6 @@ fn check_auth_value(auth: String) -> HttpResponse {
                 .header("X-Auth-User", claims.name)
                 .body("")
         }
-        _ => HttpResponse::Unauthorized().body("No Authorization Bearer Header")
+        _ => HttpResponse::Unauthorized().body("No Authorization Bearer Header"),
     }
 }

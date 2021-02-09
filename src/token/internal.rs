@@ -1,13 +1,13 @@
 extern crate jsonwebtoken as jwt;
 
+use self::jwt::Algorithm;
+use crate::token;
+use jwt::{decode, encode, Header, Validation};
+use serde_json::Value;
 use std::ops::Add;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
-use jwt::{decode, encode, Header, Validation};
-use uuid::Uuid;
 use token::models::Claims;
-use crate::token;
-use self::jwt::Algorithm;
-use serde_json::Value;
+use uuid::Uuid;
 mod conf;
 
 fn now() -> u128 {
@@ -40,8 +40,7 @@ fn generate_token_with_secret(sub: String, name: String, secret: &String) -> Str
         jti: Uuid::new_v4().to_string(),
         name,
     };
-    encode(&Header::default(), &my_claims, secret.as_ref())
-        .expect("Unable to encode claims")
+    encode(&Header::default(), &my_claims, secret.as_ref()).expect("Unable to encode claims")
 }
 
 pub fn refresh_token(token: &str) -> String {
@@ -59,7 +58,8 @@ pub fn get_claims(token: &str) -> Claims {
 
 fn get_claims_with_secret(token: &str, secret: &String) -> Claims {
     let claims = decode::<Claims>(&token, secret.as_ref(), &jwt_validation())
-        .expect("Unable to decode token").claims;
+        .expect("Unable to decode token")
+        .claims;
     claims
 }
 

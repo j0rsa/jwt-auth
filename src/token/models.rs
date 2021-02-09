@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
@@ -18,16 +18,16 @@ pub struct Claims {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct NewTokenResponse {
-    pub token: String
+    pub token: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TokenRequest {
     pub user: String,
-    pub password: String
+    pub password: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RefreshTokenRequest {
-    pub token: String
+    pub token: String,
 }
