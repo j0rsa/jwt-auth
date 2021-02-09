@@ -3,15 +3,15 @@ use std::str;
 
 pub fn sha256hash(input: &str) -> String {
     let mut hasher = Sha256::new();
-    hasher.input(input);
-    let result = hasher.result();
+    hasher.update(input);
+    let result = hasher.finalize();
     format!("{:x}", result)
 }
 
 pub fn sha512hash(input: &str) -> String {
     let mut hasher = Sha512::new();
-    hasher.input(input);
-    let result = hasher.result();
+    hasher.update(input);
+    let result = hasher.finalize();
     format!("{:x}", result)
 }
 
@@ -32,6 +32,7 @@ mod tests {
             hash
         );
     }
+
     #[test]
     fn test_sha512() {
         let hash = sha512hash("test");
