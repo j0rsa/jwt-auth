@@ -1,13 +1,13 @@
 extern crate jsonwebtoken as jwt;
 
-use self::jwt::Algorithm;
+use self::jwt::{Algorithm, EncodingKey, DecodingKey};
 use crate::token;
 use jwt::{decode, encode, Header, Validation};
-use serde_json::Value;
 use std::ops::Add;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use token::models::Claims;
 use uuid::Uuid;
+
 mod conf;
 
 fn now() -> u128 {
@@ -40,7 +40,8 @@ fn generate_token_with_secret(sub: String, name: String, secret: &String) -> Str
         jti: Uuid::new_v4().to_string(),
         name,
     };
-    encode(&Header::default(), &my_claims, secret.as_ref()).expect("Unable to encode claims")
+    encode(&Header::default(), &my_claims, &EncodingKey::from_secret(secret.as_ref()))
+        .expect("Unable to encode claims")
 }
 
 pub fn refresh_token(token: &str) -> String {
@@ -57,7 +58,7 @@ pub fn get_claims(token: &str) -> Claims {
 }
 
 fn get_claims_with_secret(token: &str, secret: &String) -> Claims {
-    let claims = decode::<Claims>(&token, secret.as_ref(), &jwt_validation())
+    let claims = decode::<Claims>(&token, &DecodingKey::from_secret(secret.as_ref()), &jwt_validation())
         .expect("Unable to decode token")
         .claims;
     claims
@@ -72,7 +73,7 @@ fn jwt_validation() -> Validation {
 
         iss: Some(conf::env_iss()),
         sub: None,
-        aud: Some(Value::String(conf::env_aud())),
+        aud: Some(vec!(conf::env_aud()).into_iter().collect()),
 
         algorithms: vec![Algorithm::HS256],
     }
@@ -105,7 +106,7 @@ mod tests {
 
     #[test]
     fn test_get_claims() {
-        let token= "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJzdWIiOiIxMjM0NTY3ODkwIiwiYXVkIjoiIiwiZXhwIjoxNTgyODQyODUzMzEyLCJuYmYiOjE1ODAyNTA4NTMzMTIsImlhdCI6MTU4MDI1MDg1MzMxMiwianRpIjoiZDEwM2FiM2QtZmM1My00OTM2LThkZjQtM2FkNTdkNmI1YjNmIiwibmFtZSI6IjEyM3Rlc3QifQ.xa57RMHUD3sTnu561IsSedgd-j627GrrKMInQt_zATk";
+        let token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJzdWIiOiIxMjM0NTY3ODkwIiwiYXVkIjoiIiwiZXhwIjoxNTgyODQyODUzMzEyLCJuYmYiOjE1ODAyNTA4NTMzMTIsImlhdCI6MTU4MDI1MDg1MzMxMiwianRpIjoiZDEwM2FiM2QtZmM1My00OTM2LThkZjQtM2FkNTdkNmI1YjNmIiwibmFtZSI6IjEyM3Rlc3QifQ.xa57RMHUD3sTnu561IsSedgd-j627GrrKMInQt_zATk";
         let secret = "test".to_string();
         let claims = get_claims_with_secret(&token.to_string(), &secret);
         assert_eq!(claims.sub, "1234567890");

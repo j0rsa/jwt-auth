@@ -30,8 +30,8 @@ pub fn env_token_secret() -> String {
     env::var("JWT_SECRET").expect("No token secret found!")
 }
 
-pub fn env_leeway() -> i64 {
-    return match i64::from_str(
+pub fn env_leeway() -> u64 {
+    return match u64::from_str(
         env::var("JWT_LEEWAY_SEC")
             .unwrap_or("0".to_string())
             .as_ref(),
