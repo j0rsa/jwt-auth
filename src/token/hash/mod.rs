@@ -5,19 +5,19 @@ pub fn sha256hash(input: &str) -> String {
     let mut hasher = Sha256::new();
     hasher.input(input);
     let result = hasher.result();
-    format!("{:x}",result)
+    format!("{:x}", result)
 }
 
 pub fn sha512hash(input: &str) -> String {
     let mut hasher = Sha512::new();
     hasher.input(input);
     let result = hasher.result();
-    format!("{:x}",result)
+    format!("{:x}", result)
 }
 
 pub fn verify_bcrypt_hash(password: &str, password_hash: &str) -> bool {
     let result = bcrypt::verify(password, password_hash);
-    return result.is_ok() && result.ok().unwrap_or(false)
+    return result.is_ok() && result.ok().unwrap_or(false);
 }
 
 #[cfg(test)]
@@ -27,7 +27,10 @@ mod tests {
     #[test]
     fn test_sha256() {
         let hash = sha256hash("test");
-        assert_eq!("9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08", hash);
+        assert_eq!(
+            "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+            hash
+        );
     }
     #[test]
     fn test_sha512() {
@@ -48,5 +51,4 @@ mod tests {
         let hash = "$2y$12$ulN.fejQw49xAXgFR1YwheYZsCPLxAQIqxCJYgScKeno36bEnqjUq";
         assert_eq!(verify_bcrypt_hash(password, hash), false)
     }
-
 }

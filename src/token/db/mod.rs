@@ -1,5 +1,5 @@
-use std::{io, env};
 use std::io::ErrorKind;
+use std::{env, io};
 
 use r2d2;
 use r2d2_postgres;
@@ -18,8 +18,15 @@ pub fn get_user(pool: &Pool, name: &String) -> Result<User, io::Error> {
     let result = connection.query(query, &[name]);
     match result {
         Ok(rows) => {
-            if rows.len() == 0 { return Err(io::Error::new(ErrorKind::NotFound, "User not found")) };
-            if rows.len() > 1 { return Err(io::Error::new(ErrorKind::InvalidInput, "User is not unique")) };
+            if rows.len() == 0 {
+                return Err(io::Error::new(ErrorKind::NotFound, "User not found"));
+            };
+            if rows.len() > 1 {
+                return Err(io::Error::new(
+                    ErrorKind::InvalidInput,
+                    "User is not unique",
+                ));
+            };
             let row = rows.get(0).unwrap();
             let user = User {
                 id: row.get(0),
@@ -28,24 +35,25 @@ pub fn get_user(pool: &Pool, name: &String) -> Result<User, io::Error> {
             };
             Ok(user)
         }
-        Err(e) => Err(io::Error::new(ErrorKind::Other, e.to_string()))
+        Err(e) => Err(io::Error::new(ErrorKind::Other, e.to_string())),
     }
 }
 
 fn find_user() -> String {
-    format!("SELECT {0}, {1}, {2} FROM {3} WHERE {1}=$1",
-            env::var("DB_QUERY_USER_ID").unwrap_or("id".to_string()),
-            env::var("DB_QUERY_USER_NAME").unwrap_or("name".to_string()),
-            env::var("DB_QUERY_USER_PASSWORD").unwrap_or("password".to_string()),
-            env::var("DB_QUERY_USERS_TABLE").unwrap_or("users".to_string()),
+    format!(
+        "SELECT {0}, {1}, {2} FROM {3} WHERE {1}=$1",
+        env::var("DB_QUERY_USER_ID").unwrap_or("id".to_string()),
+        env::var("DB_QUERY_USER_NAME").unwrap_or("name".to_string()),
+        env::var("DB_QUERY_USER_PASSWORD").unwrap_or("password".to_string()),
+        env::var("DB_QUERY_USERS_TABLE").unwrap_or("users".to_string()),
     )
 }
 
 #[cfg(test)]
 mod tests {
     use crate::token::db::{find_user, get_user};
+    use r2d2_postgres::postgres::NoTls;
     use r2d2_postgres::PostgresConnectionManager;
-    use r2d2_postgres::postgres::{NoTls};
     use std::io::ErrorKind;
 
     #[test]
@@ -57,7 +65,9 @@ mod tests {
     #[test]
     fn test_get_user_one() {
         let manager = PostgresConnectionManager::new(
-            "host=localhost user=postgres password=postgres dbname=postgres".parse().unwrap(),
+            "host=localhost user=postgres password=postgres dbname=postgres"
+                .parse()
+                .unwrap(),
             NoTls,
         );
         let pool = r2d2::Pool::new(manager).unwrap();
@@ -69,7 +79,9 @@ mod tests {
     #[test]
     fn test_get_user_double() {
         let manager = PostgresConnectionManager::new(
-            "host=localhost user=postgres password=postgres dbname=postgres".parse().unwrap(),
+            "host=localhost user=postgres password=postgres dbname=postgres"
+                .parse()
+                .unwrap(),
             NoTls,
         );
         let pool = r2d2::Pool::new(manager).unwrap();
@@ -81,7 +93,9 @@ mod tests {
     #[test]
     fn test_get_user_none() {
         let manager = PostgresConnectionManager::new(
-            "host=localhost user=postgres password=postgres dbname=postgres".parse().unwrap(),
+            "host=localhost user=postgres password=postgres dbname=postgres"
+                .parse()
+                .unwrap(),
             NoTls,
         );
         let pool = r2d2::Pool::new(manager).unwrap();
